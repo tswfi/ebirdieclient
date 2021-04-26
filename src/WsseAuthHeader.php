@@ -2,34 +2,44 @@
 
 namespace tswfi\Ebirdie;
 
+use SoapVar;
+use stdClass;
+use SimpleXMLElement;
+
 /**
  * Wsse auth header for eBirdie
  */
 class WsseAuthHeader extends \SoapHeader
 {
-    private $wss_ns = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd';
+    private $wssNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd';
+    private $wsuNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd';
+    private $passType = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText';
+    private $nonceType = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary';
 
-    public function __construct($user, $pass, $ns = null)
+    public function __construct($user, $pass)
     {
-        if ($ns) {
-            $this->wss_ns = $ns;
-        }
+        $created = gmdate('Y-m-d\TH:i:s\Z');
+        $nonce = mt_rand();
+        $encodedNonce = base64_encode(pack('H*', sha1(pack('H*', $nonce) . pack('a*', $created) . pack('a*', $pass))));
 
-        $auth = new \stdClass();
-        $auth->Username = new \SoapVar($user, XSD_STRING, null, $this->wss_ns, null, $this->wss_ns);
-        $auth->Password = new \SoapVar($pass, XSD_STRING, null, $this->wss_ns, null, $this->wss_ns);
+        // Creating WSS identification header using SimpleXML
+        $root = new SimpleXMLElement('<root/>');
 
-        $username_token = new \stdClass();
-        $username_token->UsernameToken = new \SoapVar($auth, SOAP_ENC_OBJECT, null, $this->wss_ns, 'UsernameToken', $this->wss_ns);
+        $security = $root->addChild('wsse:Security', null, $this->wssNs);
 
-        $security_sv = new \SoapVar(
-            new \SoapVar($username_token, SOAP_ENC_OBJECT, null, $this->wss_ns, 'UsernameToken', $this->wss_ns),
-            SOAP_ENC_OBJECT,
-            null,
-            $this->wss_ns,
-            'Security',
-            $this->wss_ns
-        );
-        parent::__construct($this->wss_ns, 'Security', $security_sv, true);
+        $usernameToken = $security->addChild('wsse:UsernameToken', null, $this->wssNs);
+        $usernameToken->addChild('wsse:Username', $user, $this->wssNs);
+        $passNode = $usernameToken->addChild('wsse:Password', htmlspecialchars($pass, ENT_XML1, 'UTF-8'), $this->wssNs);
+        $passNode->addAttribute('Type', $this->passType);
+
+        $nonceNode = $usernameToken->addChild('wsse:Nonce', $encodedNonce, $this->wssNs);
+        $nonceNode->addAttribute('EncodingType', $this->nonceType);
+        $usernameToken->addChild('wsu:Created', $created, $this->wsuNs);
+        // Recovering XML value from that object
+        $root->registerXPathNamespace('wsse', $this->wssNs);
+        $full = $root->xpath('/root/wsse:Security');
+        $auth = $full[0]->asXML();
+
+        parent::SoapHeader($this->wssNs, 'Security', new SoapVar($auth, XSD_ANYXML), true);
     }
 }

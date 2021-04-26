@@ -3,6 +3,7 @@
 namespace tswfi\Ebirdie;
 
 use tswfi\Ebirdie\WsseAuthHeader;
+
 /**
 *  Ebirdie client
 *
@@ -16,26 +17,28 @@ class Client extends \SoapClient
     {
         // send useragent string
         $streamContextOptions['http']['header'] = self::USERAGENT;
-        // force ipv4
+
+        // for forcing ipv4
         //$streamContextOptions['socket']['bindto'] = '0:0';
+
         $context = stream_context_create($streamContextOptions);
 
-        // build the client from parent
-        $this->_client = parent::__construct(
+        // initialize with parent
+        parent::__construct(
             $wsdl,
             [
-               'trace' => true,
-               // TODO: remove after auth tests are ok
-               'cache_wsdl' => WSDL_CACHE_NONE,
-               'exceptions' => true,
-               'stream_context' => $context,
-          ]
+                   'trace' => true,
+                   // TODO: remove after auth tests are ok
+                   'cache_wsdl' => WSDL_CACHE_NONE,
+                   'exceptions' => true,
+                   'stream_context' => $context,
+                ]
         );
 
+        // add auth headers
         $wsse_header = new WsseAuthHeader($username, $password);
-        $this->_client->__setSoapHeaders(array($wsse_header));
+        $this->__setSoapHeaders([$wsse_header]);
 
-        return $this->_client;
+        return $this;
     }
-
 }
