@@ -29,7 +29,7 @@ class Client extends \SoapClient
             [
                    'trace' => true,
                    // TODO: remove after auth tests are ok
-                   'cache_wsdl' => WSDL_CACHE_NONE,
+                   // 'cache_wsdl' => WSDL_CACHE_NONE,
                    'exceptions' => true,
                    'stream_context' => $context,
                 ]
