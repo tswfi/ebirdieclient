@@ -2,6 +2,7 @@
     "name": "tswfi/ebirdieclient",
     "description": "Client for eBirdie api",
     "keywords": ["composer", "package", "client"],
+    "homepage": "https://github.com/tswfi/ebirdieclient",
     "license": "MIT",
     "authors": [
         {
@@ -9,7 +10,7 @@
             "email": "tatu.wikman@gmail.com"
         }
     ],
-    "type": "project",
+    "type": "library",
     "require": {
 		"php": ">=7.1"
     },
