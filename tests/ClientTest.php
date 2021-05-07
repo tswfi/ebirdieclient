@@ -33,7 +33,7 @@ final class ClientTest extends TestCase
      * find club by club id
      *
      * we assume club id 1 exists
-     * and club number 99999 does not
+     * and club number -1 does not
      */
     public function test_findFullClubByClubId(): void
     {
@@ -41,7 +41,28 @@ final class ClientTest extends TestCase
         $club = $client->__soapCall('findFullClubByClubId', [['clubId' => 1]]);
         $this->assertNotEmpty($club);
 
+        // TODO: clubservice does not throw soap fault in production
+        /*
         $this->expectException('SoapFault');
-        $club = $client->__soapCall('findFullClubByClubId', [['clubId' => 99999]]);
+        $club = $client->__soapCall('findFullClubByClubId', [['clubId' => -1]]);
+        print($client->__getLastRequestHeaders());
+        print($client->__getLastRequest());
+        print($client->__getLastResponseHeaders());
+        print($client->__getLastResponse());
+        */
+    }
+
+    /**
+     * test finding person with id
+     *
+     * we assume person with id -1 does not exists
+     */
+    public function test_findPersonByPersonId(): void
+    {
+        $client = new Client(getenv('EBIRDIE_WSDL'), getenv('EBIRDIE_LOGIN'), getenv('EBIRDIE_PASS'));
+        $personRequest = new stdClass();
+        $personRequest->personId = -1;
+        $this->expectException('SoapFault');
+        $personResponse = $client->findPersonByPersonId($personRequest);
     }
 }
