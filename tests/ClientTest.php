@@ -41,15 +41,9 @@ final class ClientTest extends TestCase
         $club = $client->__soapCall('findFullClubByClubId', [['clubId' => 1]]);
         $this->assertNotEmpty($club);
 
-        // TODO: clubservice does not throw soap fault in production
-        /*
-        $this->expectException('SoapFault');
         $club = $client->__soapCall('findFullClubByClubId', [['clubId' => -1]]);
-        print($client->__getLastRequestHeaders());
-        print($client->__getLastRequest());
-        print($client->__getLastResponseHeaders());
-        print($client->__getLastResponse());
-        */
+        $this->assertNotEmpty($club);
+        $this->assertEmpty($club->return->company);
     }
 
     /**
