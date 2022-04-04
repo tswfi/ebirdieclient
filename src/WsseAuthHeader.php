@@ -3,13 +3,13 @@
 namespace tswfi\Ebirdie;
 
 use SoapVar;
-use stdClass;
 use SimpleXMLElement;
+use SoapHeader;
 
 /**
  * Wsse auth header for eBirdie
  */
-class WsseAuthHeader extends \SoapHeader
+class WsseAuthHeader extends SoapHeader
 {
     private $wssNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd';
     private $wsuNs = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd';
@@ -40,6 +40,6 @@ class WsseAuthHeader extends \SoapHeader
         $full = $root->xpath('/root/wsse:Security');
         $auth = $full[0]->asXML();
 
-        parent::SoapHeader($this->wssNs, 'Security', new SoapVar($auth, XSD_ANYXML), true);
+        parent::__construct($this->wssNs, 'Security', new SoapVar($auth, XSD_ANYXML), true);
     }
 }
