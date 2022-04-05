@@ -1,16 +1,8 @@
 # eBirdie client
 
-Tests read wsdl, user and key from environment variables
+PHP client for talking with eBirdie soap service.
 
-EBIRDIE_WSDL=https://USER:PASS@stage.uhs.golf.fi/docs/eBirdie_API-2_1_1/ns0.wsdl
-EBIRDIE_LOGIN=username
-EBIRDIE_PASS=apikey
-
-running tests
-
-```bash
-EBIRDIE_WSDL=https://USER:PASS@stage.uhs.golf.fi/docs/eBirdie_API-2_1_1/ns0.wsdl EBIRDIE_LOGIN=username EBIRDIE_PASS=apikey ./vendor/bin/phpunit tests
-```
+https://packagist.org/packages/tswfi/ebirdieclient
 
 # Usage
 
@@ -27,3 +19,14 @@ In this example the values are read from environment variables but of course you
   $client = new Client(getenv('EBIRDIE_WSDL'), getenv('EBIRDIE_LOGIN'), getenv('EBIRDIE_PASS'));
 ```
 
+## Running tests
+
+Tests read wsdl, user and key from environment variables
+
+EBIRDIE_WSDL=https://USER:PASS@stage.uhs.golf.fi/docs/eBirdie_API-2_1_1/ns0.wsdl
+EBIRDIE_LOGIN=username
+EBIRDIE_PASS=apikey
+
+```bash
+EBIRDIE_WSDL=https://USER:PASS@stage.uhs.golf.fi/docs/eBirdie_API-2_1_1/ns0.wsdl EBIRDIE_LOGIN=username EBIRDIE_PASS=apikey ./vendor/bin/phpunit tests
+```
